@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -108,7 +109,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.go('/register');
+                        },
                         child: Text(
                           "Forgot Password?",
                           style: TextStyle(color: Colors.white),
