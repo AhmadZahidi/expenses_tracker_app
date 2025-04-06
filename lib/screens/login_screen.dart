@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
 
         children: [
-          SvgPicture.asset("assets/images/Logo.svg", width: 100, height: 100),
+          SvgPicture.asset("assets/images/Logo.svg", width: 80, height: 80),
           SizedBox(height: 30),
           Text(
             "SpendBuddy",
@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         hintStyle: TextStyle(color: Colors.grey),
-                        hintText: 'username ',
+                        hintText: 'Email ',
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: EdgeInsets.symmetric(

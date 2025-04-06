@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      routerConfig: appRouter, // Use the router we defined in router.dart
+      routerConfig: appRouter,
     );
   }
 }
