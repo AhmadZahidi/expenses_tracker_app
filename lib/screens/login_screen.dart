@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,12 +13,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   // Controllers for form fields
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -51,12 +52,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Username",
+                      "Email",
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _usernameController,
+                      controller: _emailController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Color.fromARGB(100, 0, 0, 0),
                           ),
                         ),
-                        hintStyle: TextStyle(color: Colors.white),
+                        hintStyle: TextStyle(color: Colors.grey),
                         hintText: 'username ',
                         filled: true,
                         fillColor: Colors.white,
@@ -83,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _usernameController,
+                      obscureText: true,
+                      controller: _passwordController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -93,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Color.fromARGB(100, 0, 0, 0),
                           ),
                         ),
-                        hintStyle: TextStyle(color: Colors.white),
+                        hintStyle: TextStyle(color: Colors.grey),
                         hintText: 'Password ',
                         filled: true,
                         fillColor: Colors.white,
@@ -103,16 +105,47 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40,),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "Forgot Password?",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
                     // Login Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: Add Firebase Auth logic here
-                          final username = _usernameController.text;
+                        onPressed: () async {
+                          final email = _emailController.text;
                           final password = _passwordController.text;
-                          print("Username: $username, Password: $password");
+
+                          try {
+                            UserCredential userCredential = await FirebaseAuth
+                                .instance
+                                .signInWithEmailAndPassword(
+                                  email: email,
+                                  password: password,
+                                );
+
+                            //navigate to home screen
+                            print("UID:${userCredential.user?.uid}");
+                          } on FirebaseAuthException catch (e) {
+                            String errorMessage = "Login failed";
+                            if (e.code == 'user-not-found') {
+                              errorMessage = "No user found";
+                            } else if (e.code == 'wrong password') {
+                              errorMessage = "wrong password";
+                            }
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(errorMessage)),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
