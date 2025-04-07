@@ -137,6 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             //navigate to home screen
                             print("UID:${userCredential.user?.uid}");
+                            context.go('/home');
+
                           } on FirebaseAuthException catch (e) {
                             String errorMessage = "Login failed";
                             if (e.code == 'user-not-found') {
