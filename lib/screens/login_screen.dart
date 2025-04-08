@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           context.go('/register');
                         },
                         child: Text(
-                          "Forgot Password?",
+                          "Don't have an account? Sign Up",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
