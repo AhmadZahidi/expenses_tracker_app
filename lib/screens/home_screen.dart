@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       //background color
       body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16),
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
@@ -72,19 +73,51 @@ class _HomeScreenState extends State<HomeScreen> {
                   FilledButton(
                     onPressed: () {},
                     style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)
+                      ),
                       backgroundColor: buttonBackground,
                     ),
                     child: Text("Add"),
                   ),
+                  SizedBox(width: 36,),
                   FilledButton(
                     onPressed: () {},
                     style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)
+                      ),
                       backgroundColor: buttonBackground,
                     ),
                     child: Icon(Icons.camera_alt),
                   ),
                 ],
               ),
+
+              //second row title
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Expenses List",style: TextStyle(fontSize: 24),),
+                  IconButton(onPressed: (){}, icon: Icon(Icons.filter_list))
+                ],
+              ),
+
+              //content
+
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.all(8),
+                
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
+                  Text("item"),
+                  Text("price")
+                ],)
+              ),
+
             ],
           ),
         ),

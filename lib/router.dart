@@ -16,8 +16,8 @@ final GoRouter appRouter = GoRouter(
       path: '/',
       builder:
           (context, state) =>
-              BackgroundScreen(greenBackground, const LoginScreen()),
-              // const HomeScreen(),
+              // BackgroundScreen(greenBackground, const LoginScreen()),
+              const HomeScreen(),
     ),
     GoRoute(
       path: '/register',
