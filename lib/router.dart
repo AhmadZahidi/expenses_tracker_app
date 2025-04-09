@@ -1,6 +1,7 @@
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/screens/background_screen.dart';
 import 'package:expenses_tracker_app/screens/firestore_screen.dart';
+import 'package:expenses_tracker_app/screens/home_screen.dart';
 import 'package:expenses_tracker_app/screens/splash_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/login_screen.dart';
@@ -16,6 +17,7 @@ final GoRouter appRouter = GoRouter(
       builder:
           (context, state) =>
               BackgroundScreen(greenBackground, const LoginScreen()),
+              // const HomeScreen(),
     ),
     GoRoute(
       path: '/register',
