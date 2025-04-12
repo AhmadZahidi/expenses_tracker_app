@@ -1,6 +1,6 @@
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/screens/add_screen.dart';
-import 'package:expenses_tracker_app/screens/background_screen.dart';
+import 'package:expenses_tracker_app/reusable%20widget/background_screen.dart';
 import 'package:expenses_tracker_app/screens/firestore_screen.dart';
 import 'package:expenses_tracker_app/screens/home_screen.dart';
 import 'package:expenses_tracker_app/screens/splash_screen.dart';
