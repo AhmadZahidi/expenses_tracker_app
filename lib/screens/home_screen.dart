@@ -64,60 +64,88 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               //show total expenses
-              Text("RM total expenses"),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 0.0,
+                  vertical: 8.0,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 150,
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    color: Colors.white,
+                    child: Center(
+                      child: Text(
+                        "RM total expenses",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
               //button for add and camera icon
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FilledButton(
-                    onPressed: () {},
-                    style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FilledButton(
+                      onPressed: () {},
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        backgroundColor: buttonBackground,
                       ),
-                      backgroundColor: buttonBackground,
+                      child: Text("Add"),
                     ),
-                    child: Text("Add"),
-                  ),
-                  SizedBox(width: 36,),
-                  FilledButton(
-                    onPressed: () {},
-                    style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)
+                    SizedBox(width: 36),
+                    FilledButton(
+                      onPressed: () {},
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        backgroundColor: buttonBackground,
                       ),
-                      backgroundColor: buttonBackground,
+                      child: Icon(Icons.camera_alt),
                     ),
-                    child: Icon(Icons.camera_alt),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               //second row title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Expenses List",style: TextStyle(fontSize: 24),),
-                  IconButton(onPressed: (){}, icon: Icon(Icons.filter_list))
+                  Text("Expenses List", style: TextStyle(fontSize: 24)),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.filter_list)),
                 ],
               ),
 
               //content
-
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 padding: EdgeInsets.all(8),
-                
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
-                  Text("item"),
-                  Text("price")
-                ],)
-              ),
 
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text("item"), Text("price")],
+                ),
+              ),
             ],
           ),
         ),
