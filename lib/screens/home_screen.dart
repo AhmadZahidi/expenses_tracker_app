@@ -1,6 +1,7 @@
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilledButton(
-                      onPressed: () {},
+                      onPressed: () {context.push('/home/add');},
                       style: FilledButton.styleFrom(
                         padding: EdgeInsets.symmetric(horizontal: 24),
                         shape: RoundedRectangleBorder(
