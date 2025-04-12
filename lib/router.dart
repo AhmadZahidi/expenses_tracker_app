@@ -17,16 +17,14 @@ final GoRouter appRouter = GoRouter(
       path: '/',
       builder:
           (context, state) =>
-              // BackgroundScreen(greenBackground, const LoginScreen()),
+              //  const LoginScreen(),
               const HomeScreen(),
     ),
     GoRoute(
       path: '/register',
-      builder:
-          (context, state) =>
-              BackgroundScreen(greenBackground, const RegisterScreen()),
+      builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(path: '/home', builder: (context, state) => FirestoreScreen()),
-    GoRoute(path: '/home/add',builder: (context, state) => AddScreen(),)
+    GoRoute(path: '/home/add', builder: (context, state) => AddScreen()),
   ],
 );
