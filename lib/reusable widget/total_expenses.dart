@@ -9,13 +9,14 @@ class TotalExpenses extends StatefulWidget {
 }
 
 class _TotalExpensesState extends State<TotalExpenses> {
-  final crudService = CrudService(); // Or inject it however you prefer
+  final crudService = CrudService();
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Map<String, dynamic>>>(
       stream: crudService.getExpenses(),
       builder: (context, snapshot) {
+        
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Text("Loading...");
         }

@@ -1,4 +1,5 @@
 import 'package:expenses_tracker_app/background_color.dart';
+import 'package:expenses_tracker_app/reusable%20widget/list_expenses.dart';
 import 'package:expenses_tracker_app/reusable%20widget/mainBar.dart';
 import 'package:expenses_tracker_app/reusable%20widget/total_expenses.dart';
 import 'package:flutter/material.dart';
@@ -99,18 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               //content
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: EdgeInsets.all(8),
-
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text("item"), Text("price")],
-                ),
-              ),
+              ListExpenses(),
             ],
           ),
         ),
