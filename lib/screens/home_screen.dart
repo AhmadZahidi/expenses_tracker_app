@@ -1,5 +1,6 @@
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/reusable%20widget/mainBar.dart';
+import 'package:expenses_tracker_app/reusable%20widget/total_expenses.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -49,13 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     color: Colors.white,
                     child: Center(
-                      child: Text(
-                        "RM total expenses",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: TotalExpenses(),
                     ),
                   ),
                 ),

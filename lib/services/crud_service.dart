@@ -27,4 +27,25 @@ class CrudService {
       return null;
     }
   }
+
+  Stream<List<Map<String, dynamic>>> getExpenses() {
+    final String uid = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('expenses')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map(
+                    (doc) => {
+                      'id': doc.id,
+                      ...doc.data() as Map<String, dynamic>,
+                    },
+                  )
+                  .toList(),
+        );
+  }
+
 }
