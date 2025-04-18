@@ -100,7 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               //content
-              ListExpenses(),
+              
+              Expanded(child: ListExpenses(),)
+             
             ],
           ),
         ),
