@@ -1,6 +1,7 @@
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/reusable%20widget/list_expenses.dart';
 import 'package:expenses_tracker_app/reusable%20widget/mainBar.dart';
+import 'package:expenses_tracker_app/reusable%20widget/navigation_drawer_items.dart';
 import 'package:expenses_tracker_app/reusable%20widget/total_expenses.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,11 +14,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       //appbar
-      appBar: MainBar(),
+      appBar: MainBar(scaffoldKey: _scaffoldKey,),
+      drawer: NavigationDrawerItems(),
 
       //background color
       body: Container(

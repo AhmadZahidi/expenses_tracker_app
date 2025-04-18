@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class MainBar extends StatelessWidget implements PreferredSizeWidget {
-  const MainBar({super.key});
+    final GlobalKey<ScaffoldState> scaffoldKey;
+
+  const MainBar({super.key,required this.scaffoldKey});
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
@@ -12,7 +14,9 @@ class MainBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Color.fromRGBO(76, 175, 80, 1),
       leading: IconButton(
-        onPressed: () {},
+        onPressed: (){
+          scaffoldKey.currentState?.openDrawer();
+        },
         icon: Icon(Icons.menu),
         color: Colors.white,
       ),

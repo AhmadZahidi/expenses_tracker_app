@@ -84,9 +84,12 @@ class _ListExpensesState extends State<ListExpenses> {
               }
 
               final item = _expenses[index];
-              return Card(
+              return Card(    
+                elevation: 3,            
                 margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 child: ListTile(
+                  tileColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   title: Text(item['name'] ?? 'Unnamed'),
                   subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
                   trailing: Text("RM ${item['price'] ?? '-'}"),
