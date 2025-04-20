@@ -23,7 +23,10 @@ class _ListExpensesState extends State<ListExpenses> {
     _loadMoreExpenses();
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 && !_isLoading && _hasMore) {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200 &&
+          !_isLoading &&
+          _hasMore) {
         _loadMoreExpenses();
       }
     });
@@ -45,7 +48,8 @@ class _ListExpensesState extends State<ListExpenses> {
     }
 
     final snapshot = await query.get();
-    final newExpenses = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    final newExpenses =
+        snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
 
     if (snapshot.docs.isNotEmpty) {
       _lastDocument = snapshot.docs.last;
@@ -71,31 +75,33 @@ class _ListExpensesState extends State<ListExpenses> {
     return _expenses.isEmpty && _isLoading
         ? const Center(child: CircularProgressIndicator())
         : ListView.builder(
-            controller: _scrollController,
-            // shrinkWrap: true,
-            // physics: const NeverScrollableScrollPhysics(),
-            itemCount: _expenses.length + (_hasMore ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index == _expenses.length) {
-                return const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              final item = _expenses[index];
-              return Card(    
-                elevation: 3,            
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                child: ListTile(
-                  tileColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  title: Text(item['name'] ?? 'Unnamed'),
-                  subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
-                  trailing: Text("RM ${item['price'] ?? '-'}"),
-                ),
+          controller: _scrollController,
+          // shrinkWrap: true,
+          // physics: const NeverScrollableScrollPhysics(),
+          itemCount: _expenses.length + (_hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == _expenses.length) {
+              return const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: CircularProgressIndicator()),
               );
-            },
-          );
+            }
+
+            final item = _expenses[index];
+            return Card(
+              elevation: 3,
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              child: ListTile(
+                tileColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                title: Text(item['name'] ?? 'Unnamed'),
+                subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
+                trailing: Text("RM ${item['price'] ?? '-'}"),
+              ),
+            );
+          },
+        );
   }
 }

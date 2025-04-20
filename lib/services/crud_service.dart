@@ -5,6 +5,7 @@ class CrudService {
   Future<DocumentReference<Object?>>? addExpense(
     String name,
     String category,
+    String desc,
     double price,
     int quantity,
     DateTime date,
@@ -18,6 +19,7 @@ class CrudService {
           .add({
             'name': name,
             'category': category,
+            'desc':desc,
             'price': price,
             'quantity': quantity,
             'date': date.toIso8601String(),

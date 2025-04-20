@@ -123,198 +123,219 @@ class _AddScreenState extends State<AddScreen> {
                         ),
               ),
               const SizedBox(height: 16),
-              // Name
-              TextFormField(
-                controller: _nameController,
-                validator:
-                    (value) =>
-                        value == null || value.trim().isEmpty
-                            ? 'Please enter a name'
-                            : null,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromARGB(100, 0, 0, 0)),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-
-              // Category
-              DropdownButtonFormField(
-                value: _selectedCategory,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  labelText: 'Category',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 16,
-                  ),
-                ),
-                items:
-                    _categories.map((category) {
-                      return DropdownMenuItem(
-                        value: category,
-                        child: Text(category),
-                      );
-                    }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                },
-                validator:
-                    (value) =>
-                        value == null ? "Please select a category" : null,
-              ),
-              SizedBox(height: 30),
-
-              //description
-              TextFormField(
-                controller: _descController,
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromARGB(100, 0, 0, 0)),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-
-              // Price
-              TextFormField(
-                controller: _priceController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Enter a price';
-                  final number = num.tryParse(value);
-                  if (number == null || number <= 0) {
-                    return 'Enter a valid price';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  labelText: 'Price (RM)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromARGB(100, 0, 0, 0)),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-
-              // Quantity
-              TextFormField(
-                controller: _quantityController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Enter quantity';
-                  final number = int.tryParse(value);
-                  if (number == null || number <= 0) {
-                    return 'Enter a valid quantity';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  labelText: 'Quantity',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromARGB(100, 0, 0, 0)),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-
-              //Date Picker
-              TextFormField(
-                controller: _dateController,
-                readOnly: true,
-                onTap: () => _pickDate(context),
-                decoration: InputDecoration(
-                  labelText: 'Date',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-              ),
-              SizedBox(height: 30),
-
-              // Submit button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FilledButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // send data
-                        crudService.addExpense(
-                          _nameController.text,
-                          _selectedCategory!,
-                          double.parse(_priceController.text),
-                          int.parse(_quantityController.text),
-                          _selectedDate!,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Item add successfully')),
-                        );
-                        _nameController.clear();
-                        _priceController.clear();
-                        _quantityController.clear();
-                        _dateController.clear();
-                        _selectedCategory = null;
-                        _selectedDate = null;
-                        setState(() {});
-                      }
-                    },
-                    style: FilledButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.only(bottom: 16),
+                  children: [
+                    // Name
+                    TextFormField(
+                      controller: _nameController,
+                      validator:
+                          (value) =>
+                              value == null || value.trim().isEmpty
+                                  ? 'Please enter a name'
+                                  : null,
+                      decoration: InputDecoration(
+                        labelText: 'Name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(100, 0, 0, 0),
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                       ),
-                      backgroundColor: buttonBackground,
                     ),
-                    child: Text('Submit'),
-                  ),
-                ],
+                    SizedBox(height: 30),
+
+                    // Category
+                    DropdownButtonFormField(
+                      value: _selectedCategory,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        labelText: 'Category',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 16,
+                        ),
+                      ),
+                      items:
+                          _categories.map((category) {
+                            return DropdownMenuItem(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value;
+                        });
+                      },
+                      validator:
+                          (value) =>
+                              value == null ? "Please select a category" : null,
+                    ),
+                    SizedBox(height: 30),
+
+                    //description
+                    TextFormField(
+                      controller: _descController,
+                      decoration: InputDecoration(
+                        labelText: 'Description',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(100, 0, 0, 0),
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+
+                    // Price
+                    TextFormField(
+                      controller: _priceController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return 'Enter a price';
+                        final number = num.tryParse(value);
+                        if (number == null || number <= 0) {
+                          return 'Enter a valid price';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Price (RM)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(100, 0, 0, 0),
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+
+                    // Quantity
+                    TextFormField(
+                      controller: _quantityController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return 'Enter quantity';
+                        final number = int.tryParse(value);
+                        if (number == null || number <= 0) {
+                          return 'Enter a valid quantity';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Quantity',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(100, 0, 0, 0),
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+
+                    //Date Picker
+                    TextFormField(
+                      controller: _dateController,
+                      readOnly: true,
+                      onTap: () => _pickDate(context),
+                      decoration: InputDecoration(
+                        labelText: 'Date',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        suffixIcon: Icon(Icons.calendar_today),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+
+                    // Submit button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FilledButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              // send data
+                              crudService.addExpense(
+                                _nameController.text,
+                                _selectedCategory!,
+                                _descController.text,
+                                double.parse(_priceController.text),
+                                int.parse(_quantityController.text),
+                                _selectedDate!,
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Item add successfully'),
+                                ),
+                              );
+                              _nameController.clear();
+                              _priceController.clear();
+                              _quantityController.clear();
+                              _dateController.clear();
+                              _descController.clear();
+                              _selectedCategory = null;
+                              _selectedDate = null;
+                              setState(() {});
+                            }
+                          },
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 24),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: buttonBackground,
+                          ),
+                          child: Text('Submit'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
