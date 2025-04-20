@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expenses_tracker_app/services/crud_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 
 class ListExpenses extends StatefulWidget {
   const ListExpenses({super.key});
@@ -10,17 +12,17 @@ class ListExpenses extends StatefulWidget {
 }
 
 class _ListExpensesState extends State<ListExpenses> {
+  final crudService = CrudService();
+
   final ScrollController _scrollController = ScrollController();
   final int _itemsPerPage = 10;
-  List<Map<String, dynamic>> _expenses = [];
   bool _isLoading = false;
-  DocumentSnapshot? _lastDocument;
   bool _hasMore = true;
+  DocumentSnapshot? _lastDocument;
 
   @override
   void initState() {
     super.initState();
-    _loadMoreExpenses();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -57,7 +59,6 @@ class _ListExpensesState extends State<ListExpenses> {
 
     setState(() {
       _isLoading = false;
-      _expenses.addAll(newExpenses);
       if (newExpenses.length < _itemsPerPage) {
         _hasMore = false;
       }
@@ -72,36 +73,50 @@ class _ListExpensesState extends State<ListExpenses> {
 
   @override
   Widget build(BuildContext context) {
-    return _expenses.isEmpty && _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : ListView.builder(
-          controller: _scrollController,
-          // shrinkWrap: true,
-          // physics: const NeverScrollableScrollPhysics(),
-          itemCount: _expenses.length + (_hasMore ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index == _expenses.length) {
-              return const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: crudService.getExpenses(), 
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-            final item = _expenses[index];
-            return Card(
-              elevation: 3,
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              child: ListTile(
-                tileColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                title: Text(item['name'] ?? 'Unnamed'),
-                subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
-                trailing: Text("RM ${item['price'] ?? '-'}"),
-              ),
-            );
-          },
-        );
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final expenses = snapshot.data ?? [];
+
+        return expenses.isEmpty
+            ? const Center(child: Text("No expenses found"))
+            : ListView.builder(
+              padding: EdgeInsets.only(bottom: 16),
+                controller: _scrollController,
+                itemCount: expenses.length + (_hasMore ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == expenses.length) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  final item = expenses[index];
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    child: ListTile(
+                      tileColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      title: Text(item['name'] ?? 'Unnamed'),
+                      subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
+                      trailing: Text("RM ${item['price'] ?? '-'}"),
+                    ),
+                  );
+                },
+              );
+      },
+    );
   }
 }
