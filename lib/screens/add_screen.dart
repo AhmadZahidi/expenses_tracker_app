@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/reusable%20widget/background_screen.dart';
 import 'package:expenses_tracker_app/reusable%20widget/crudbar.dart';
 import 'package:expenses_tracker_app/services/crud_service.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -17,12 +22,47 @@ class _AddScreenState extends State<AddScreen> {
   final _formKey = GlobalKey<FormState>();
 
   DateTime? _selectedDate;
+  File? _receiptImage;
+  String? _uploadedImageUrl;
+
+  final picker = ImagePicker();
 
   final CrudService crudService = CrudService();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
+
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _receiptImage = File(pickedFile.path);
+      });
+      await _uploadImage(File(pickedFile.path));
+    }
+  }
+
+  Future<void> _uploadImage(File image) async {
+    try {
+      final filename = const Uuid().v4(); // Generate a unique filename
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('receipts')
+          .child('$filename.jpg');
+
+      await ref.putFile(image);
+      final downloadUrl = await ref.getDownloadURL();
+
+      setState(() {
+        _uploadedImageUrl = downloadUrl;
+      });
+    } catch (e) {
+      print('Image upload error: $e');
+      // You can show a snackbar or dialog here if needed
+    }
+  }
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -54,6 +94,7 @@ class _AddScreenState extends State<AddScreen> {
     _nameController.dispose();
     _priceController.dispose();
     _quantityController.dispose();
+    _descController.dispose();
     super.dispose();
   }
 
@@ -69,6 +110,19 @@ class _AddScreenState extends State<AddScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              GestureDetector(
+                onTap: _pickImage,
+                child:
+                    _receiptImage != null
+                        ? Image.file(_receiptImage!, height: 200)
+                        : Container(
+                          height: 200,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.camera_alt, size: 50),
+                        ),
+              ),
+              const SizedBox(height: 16),
               // Name
               TextFormField(
                 controller: _nameController,
@@ -123,6 +177,27 @@ class _AddScreenState extends State<AddScreen> {
                 validator:
                     (value) =>
                         value == null ? "Please select a category" : null,
+              ),
+              SizedBox(height: 30),
+
+              //description
+              TextFormField(
+                controller: _descController,
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromARGB(100, 0, 0, 0)),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                ),
               ),
               SizedBox(height: 30),
 

@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'firebase_options.dart';
+/// import 'firebase_options  .dart';
 /// // ...
 /// await Firebase.initializeApp(
 ///   options: DefaultFirebaseOptions.currentPlatform,
@@ -41,48 +41,47 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAXOnK1CWoQac6mTnAy39bGfAUVK9phiq8',
-    appId: '1:70573966202:web:45d959dbde529aa87a0cc3',
-    messagingSenderId: '70573966202',
-    projectId: 'expenses-tracker-1926d',
-    authDomain: 'expenses-tracker-1926d.firebaseapp.com',
-    storageBucket: 'expenses-tracker-1926d.firebasestorage.app',
-    measurementId: 'G-XFC5VZ10BZ',
+    apiKey: 'AIzaSyDlHAUGx79rKcS6xnUKPF0cKngh4hYGI0E',
+    appId: '1:959730194266:web:17ef78c7e9d6aec6e70563',
+    messagingSenderId: '959730194266',
+    projectId: 'expenses-tracker-3231f',
+    authDomain: 'expenses-tracker-3231f.firebaseapp.com',
+    storageBucket: 'expenses-tracker-3231f.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA0FvktU-D6E42LOgTNTfEjoZsglaA6ukg',
-    appId: '1:70573966202:android:06759aef579f76547a0cc3',
-    messagingSenderId: '70573966202',
-    projectId: 'expenses-tracker-1926d',
-    storageBucket: 'expenses-tracker-1926d.firebasestorage.app',
+    apiKey: 'AIzaSyBGmTlFJ7I8aoSxgkLg_U62-1B4vFbNqGA',
+    appId: '1:959730194266:android:bfebb21f9fd6e053e70563',
+    messagingSenderId: '959730194266',
+    projectId: 'expenses-tracker-3231f',
+    storageBucket: 'expenses-tracker-3231f.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAOb0ClkObmaMDTfKjuEdp_8grjjkijTFk',
-    appId: '1:70573966202:ios:223606696958eb107a0cc3',
-    messagingSenderId: '70573966202',
-    projectId: 'expenses-tracker-1926d',
-    storageBucket: 'expenses-tracker-1926d.firebasestorage.app',
+    apiKey: 'AIzaSyA4RQGwRzEiNJY5gfm1ZI0lIyN5sEYsDds',
+    appId: '1:959730194266:ios:396c1c1f9a7881eee70563',
+    messagingSenderId: '959730194266',
+    projectId: 'expenses-tracker-3231f',
+    storageBucket: 'expenses-tracker-3231f.firebasestorage.app',
     iosBundleId: 'com.example.expensesTrackerApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAOb0ClkObmaMDTfKjuEdp_8grjjkijTFk',
-    appId: '1:70573966202:ios:223606696958eb107a0cc3',
-    messagingSenderId: '70573966202',
-    projectId: 'expenses-tracker-1926d',
-    storageBucket: 'expenses-tracker-1926d.firebasestorage.app',
+    apiKey: 'AIzaSyA4RQGwRzEiNJY5gfm1ZI0lIyN5sEYsDds',
+    appId: '1:959730194266:ios:396c1c1f9a7881eee70563',
+    messagingSenderId: '959730194266',
+    projectId: 'expenses-tracker-3231f',
+    storageBucket: 'expenses-tracker-3231f.firebasestorage.app',
     iosBundleId: 'com.example.expensesTrackerApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAXOnK1CWoQac6mTnAy39bGfAUVK9phiq8',
-    appId: '1:70573966202:web:cf3f368a6c49bd6f7a0cc3',
-    messagingSenderId: '70573966202',
-    projectId: 'expenses-tracker-1926d',
-    authDomain: 'expenses-tracker-1926d.firebaseapp.com',
-    storageBucket: 'expenses-tracker-1926d.firebasestorage.app',
-    measurementId: 'G-T7G0FSCV0V',
+    apiKey: 'AIzaSyDlHAUGx79rKcS6xnUKPF0cKngh4hYGI0E',
+    appId: '1:959730194266:web:fadedfc3114924f3e70563',
+    messagingSenderId: '959730194266',
+    projectId: 'expenses-tracker-3231f',
+    authDomain: 'expenses-tracker-3231f.firebaseapp.com',
+    storageBucket: 'expenses-tracker-3231f.firebasestorage.app',
   );
+
 }
