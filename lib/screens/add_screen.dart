@@ -4,10 +4,8 @@ import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/reusable%20widget/background_screen.dart';
 import 'package:expenses_tracker_app/reusable%20widget/crudbar.dart';
 import 'package:expenses_tracker_app/services/crud_service.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -40,27 +38,20 @@ class _AddScreenState extends State<AddScreen> {
       setState(() {
         _receiptImage = File(pickedFile.path);
       });
-      await _uploadImage(File(pickedFile.path));
+      // await _uploadImage(File(pickedFile.path));
     }
   }
 
   Future<void> _uploadImage(File image) async {
-    try {
-      final filename = const Uuid().v4(); // Generate a unique filename
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('receipts')
-          .child('$filename.jpg');
-
-      await ref.putFile(image);
-      final downloadUrl = await ref.getDownloadURL();
-
+    final downloadUrl = await crudService.uploadImageToFirebase(image);
+    if (downloadUrl != null) {
       setState(() {
         _uploadedImageUrl = downloadUrl;
       });
-    } catch (e) {
-      print('Image upload error: $e');
-      // You can show a snackbar or dialog here if needed
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to upload image')));
     }
   }
 
@@ -108,7 +99,7 @@ class _AddScreenState extends State<AddScreen> {
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
                 onTap: _pickImage,
@@ -125,7 +116,7 @@ class _AddScreenState extends State<AddScreen> {
               const SizedBox(height: 16),
               Expanded(
                 child: ListView(
-                  padding: EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.symmetric(vertical: 16),
                   children: [
                     // Name
                     TextFormField(
@@ -298,31 +289,61 @@ class _AddScreenState extends State<AddScreen> {
                       children: [
                         FilledButton(
                           onPressed: () {
+                            setState(() {
+                              _receiptImage = null;
+                              _uploadedImageUrl = null;
+                            });
+                          },
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 24),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              190,
+                              178,
+                              0,
+                            ),
+                          ),
+                          child: Text('Clear Image'),
+                        ),
+                        SizedBox(width: 16),
+                        FilledButton(
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              // send data
-                              crudService.addExpense(
+                              if (_receiptImage != null &&
+                                  _uploadedImageUrl == null) {
+                                await _uploadImage(_receiptImage!);
+                              }
+
+                              await crudService.addExpense(
                                 _nameController.text,
                                 _selectedCategory!,
                                 _descController.text,
                                 double.parse(_priceController.text),
                                 int.parse(_quantityController.text),
                                 _selectedDate!,
+                                _uploadedImageUrl,
                               );
+
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Item add successfully'),
+                                  content: Text('Item added successfully'),
                                 ),
                               );
+
+                              _formKey.currentState!.reset();
                               _nameController.clear();
                               _priceController.clear();
                               _quantityController.clear();
-                              _dateController.clear();
                               _descController.clear();
+                              _dateController.clear();
                               _selectedCategory = null;
                               _selectedDate = null;
-                              setState(() {});
                             }
                           },
+
                           style: FilledButton.styleFrom(
                             padding: EdgeInsets.symmetric(horizontal: 24),
                             shape: RoundedRectangleBorder(

@@ -3,7 +3,6 @@ import 'package:expenses_tracker_app/services/crud_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-
 class ListExpenses extends StatefulWidget {
   const ListExpenses({super.key});
 
@@ -74,9 +73,10 @@ class _ListExpensesState extends State<ListExpenses> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: crudService.getExpenses(), 
+      stream: crudService.getExpenses(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData &&
+            snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -89,33 +89,29 @@ class _ListExpensesState extends State<ListExpenses> {
         return expenses.isEmpty
             ? const Center(child: Text("No expenses found"))
             : ListView.builder(
-              padding: EdgeInsets.only(bottom: 16),
-                controller: _scrollController,
-                itemCount: expenses.length + (_hasMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == expenses.length) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-
-                  final item = expenses[index];
-                  return Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                    child: ListTile(
-                      tileColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      title: Text(item['name'] ?? 'Unnamed'),
-                      subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
-                      trailing: Text("RM ${item['price'] ?? '-'}"),
+              padding: const EdgeInsets.only(bottom: 16),
+              controller: _scrollController,
+              itemCount: expenses.length,
+              itemBuilder: (context, index) {
+                final item = expenses[index];
+                return Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 8,
+                  ),
+                  child: ListTile(
+                    tileColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
-              );
+                    title: Text(item['name'] ?? 'Unnamed'),
+                    subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
+                    trailing: Text("RM ${item['price'] ?? '-'}"),
+                  ),
+                );
+              },
+            );
       },
     );
   }
