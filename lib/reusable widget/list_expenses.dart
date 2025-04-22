@@ -13,62 +13,54 @@ class ListExpenses extends StatefulWidget {
 class _ListExpensesState extends State<ListExpenses> {
   final crudService = CrudService();
 
-  final ScrollController _scrollController = ScrollController();
-  final int _itemsPerPage = 10;
-  bool _isLoading = false;
-  bool _hasMore = true;
-  DocumentSnapshot? _lastDocument;
-
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: crudService.getExpenses(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData &&
+            snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 200 &&
-          !_isLoading &&
-          _hasMore) {
-        _loadMoreExpenses();
-      }
-    });
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final expenses = snapshot.data ?? [];
+
+        return expenses.isEmpty
+            ? const Center(child: Text("No expenses found"))
+            : ListView.builder(
+                padding: const EdgeInsets.only(bottom: 16),
+                itemCount: expenses.length,
+                itemBuilder: (context, index) {
+                  final item = expenses[index];
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 8,
+                    ),
+                    child: ListTile(
+                      tileColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      title: Text(item['name'] ?? 'Unnamed'),
+                      subtitle:
+                          Text("Quantity: ${item['quantity'] ?? '-'}"),
+                      trailing: Text("RM ${item['price'] ?? '-'}"),
+                    ),
+                  );
+                },
+              );
+      },
+    );
   }
+}
 
-  Future<void> _loadMoreExpenses() async {
-    setState(() => _isLoading = true);
-
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    Query query = FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('expenses')
-        .orderBy('date', descending: true)
-        .limit(_itemsPerPage);
-
-    if (_lastDocument != null) {
-      query = query.startAfterDocument(_lastDocument!);
-    }
-
-    final snapshot = await query.get();
-    final newExpenses =
-        snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-
-    if (snapshot.docs.isNotEmpty) {
-      _lastDocument = snapshot.docs.last;
-    }
-
-    setState(() {
-      _isLoading = false;
-      if (newExpenses.length < _itemsPerPage) {
-        _hasMore = false;
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+  final crudService = CrudService();
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +82,6 @@ class _ListExpensesState extends State<ListExpenses> {
             ? const Center(child: Text("No expenses found"))
             : ListView.builder(
               padding: const EdgeInsets.only(bottom: 16),
-              controller: _scrollController,
               itemCount: expenses.length,
               itemBuilder: (context, index) {
                 final item = expenses[index];
@@ -115,4 +106,3 @@ class _ListExpensesState extends State<ListExpenses> {
       },
     );
   }
-}
