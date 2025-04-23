@@ -1,6 +1,8 @@
 import 'package:expenses_tracker_app/screens/add_screen.dart';
 import 'package:expenses_tracker_app/screens/home_screen.dart';
+import 'package:expenses_tracker_app/screens/report_screen.dart';
 import 'package:expenses_tracker_app/screens/splash_screen.dart';
+import 'package:expenses_tracker_app/screens/test_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
@@ -12,10 +14,8 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/',
-      builder:
-          (context, state) =>
-               const LoginScreen(),
-              // const HomeScreen(),
+      builder: (context, state) => const LoginScreen(),
+      // const HomeScreen(),
     ),
     GoRoute(
       path: '/register',
@@ -23,5 +23,8 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
     GoRoute(path: '/home/add', builder: (context, state) => AddScreen()),
+
+    GoRoute(path: '/report', builder: (context, state) => ReportScreen()),
+    GoRoute(path: '/test', builder: (context, state) => TestScreen()),
   ],
 );

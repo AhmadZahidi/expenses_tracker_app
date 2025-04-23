@@ -43,6 +43,15 @@ class NavigationDrawerItems extends StatelessWidget {
               }
             },
           ),
+          ListTile(
+            title: Text('Test'),
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              if(context.mounted){
+                context.go('/test');
+              }
+            },
+          ),
         ],
       ),
     );
