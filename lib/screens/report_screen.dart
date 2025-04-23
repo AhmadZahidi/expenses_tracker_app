@@ -16,7 +16,6 @@ class ReportScreen extends StatefulWidget {
 class _ReportScreenState extends State<ReportScreen> {
   final userId = FirebaseAuth.instance.currentUser!.uid;
 
-  // Define category-color mapping
   final Map<String, Color> categoryColors = {
     'Food': Colors.green,
     'Transport': Colors.blue,
@@ -88,7 +87,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       value: entry.value,
                       color: categoryColors[entry.key] ?? Colors.grey,
                       title: '$percentage%',
-                      radius: 100,
+                      radius: 90,
                       titleStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -97,27 +96,68 @@ class _ReportScreenState extends State<ReportScreen> {
                     );
                   }).toList();
 
-              return Column(
-                children: [
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 8,
-                    children:
-                        categoryColors.entries.map((entry) {
-                          return _category(entry.value, entry.key);
-                        }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: PieChart(
-                      PieChartData(
-                        sectionsSpace: 0,
-                        centerSpaceRadius: 0,
-                        sections: sections,
+              final firstHalf =
+                  categoryColors.entries
+                      .take((categoryColors.length / 2).ceil())
+                      .toList();
+
+              final secondHalf =
+                  categoryColors.entries
+                      .skip((categoryColors.length / 2).ceil())
+                      .toList();
+
+              return Card(
+                elevation: 8,
+                margin: EdgeInsets.symmetric(vertical: 16,),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal:  3.5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Center vertically
+                    children: [
+                      // First half
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:
+                            firstHalf
+                                .map(
+                                  (entry) => _categoryFirstHalf(
+                                    entry.value,
+                                    entry.key,
+                                  ),
+                                )
+                                .toList(),
                       ),
-                    ),
+
+                      // Pie Chart
+                      SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: PieChart(
+                          PieChartData(
+                            sectionsSpace: 0,
+                            centerSpaceRadius: 0,
+                            sections: sections,
+                          ),
+                        ),
+                      ),
+
+                      // Second half
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children:
+                            secondHalf
+                                .map(
+                                  (entry) => _categorySecondHalf(entry.value, entry.key),
+                                )
+                                .toList(),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               );
             },
           ),
@@ -126,13 +166,13 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  Widget _category(Color color, String text) {
+  Widget _categoryFirstHalf(Color color, String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 16,
-          height: 16,
+          height: 56,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
@@ -140,4 +180,20 @@ class _ReportScreenState extends State<ReportScreen> {
       ],
     );
   }
+}
+
+Widget _categorySecondHalf(Color color, String text) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(text, style: const TextStyle(color: Colors.black, fontSize: 14)),
+      const SizedBox(width: 8),
+      Container(
+        width: 16,
+        height: 56,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+      
+    ],
+  );
 }
