@@ -14,15 +14,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final MenuController _filterMenuContoller = MenuController();
+  bool showAll = true;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
       //appbar
-      appBar: MainBar(scaffoldKey: _scaffoldKey,),
+      appBar: MainBar(scaffoldKey: _scaffoldKey),
       drawer: NavigationDrawerItems(),
 
       //background color
@@ -56,9 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     color: Colors.white,
-                    child: Center(
-                      child: TotalExpenses(),
-                    ),
+                    child: Center(child: TotalExpenses(showAll: showAll)),
                   ),
                 ),
               ),
@@ -70,7 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilledButton(
-                      onPressed: () {context.push('/home/add');},
+                      onPressed: () {
+                        context.push('/home/add');
+                      },
                       style: FilledButton.styleFrom(
                         padding: EdgeInsets.symmetric(horizontal: 24),
                         shape: RoundedRectangleBorder(
@@ -101,14 +103,44 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Expenses List", style: TextStyle(fontSize: 24)),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.filter_list)),
+                  MenuAnchor(
+                    controller: _filterMenuContoller,
+                    builder: (context, controller, child) {
+                      return IconButton(
+                        onPressed: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
+                          }
+                        },
+                        icon: Icon(Icons.filter_list),
+                      );
+                    },
+                    menuChildren: [
+                      MenuItemButton(
+                        onPressed: () {
+                          setState(() {
+                            showAll = true;
+                          });
+                          _filterMenuContoller.close();
+                        },
+                        child: Text('Show All'),
+                      ),
+                      MenuItemButton(onPressed: () {
+                        setState(() {
+                          showAll=false;
+                          //by month, TO Do
+                        });
+                        _filterMenuContoller.close();
+                      }, child: Text('By Month')),
+                    ],
+                  ),
                 ],
               ),
 
               //content
-              
-              Expanded(child: ListExpenses(),)
-             
+              Expanded(child: ListExpenses(showAll: showAll)),
             ],
           ),
         ),

@@ -2,7 +2,9 @@ import 'package:expenses_tracker_app/services/crud_service.dart';
 import 'package:flutter/material.dart';
 
 class TotalExpenses extends StatefulWidget {
-  const TotalExpenses({super.key});
+  TotalExpenses({super.key,required this.showAll});
+
+  bool showAll;
 
   @override
   State<TotalExpenses> createState() => _TotalExpensesState();

@@ -55,6 +55,7 @@ class CrudService {
         );
   }
 
+
   Future<String?> uploadImageToFirebase(File imageFile) async {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
