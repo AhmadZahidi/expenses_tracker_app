@@ -16,8 +16,26 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final MenuController _filterMenuContoller = MenuController();
   bool showAll = true;
+  DateTime? selectedMonth;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Future<void> _selectMonth(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedMonth ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+      initialDatePickerMode: DatePickerMode.year, // Start at year level
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedMonth = DateTime(picked.year, picked.month);
+        showAll = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,13 +145,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         child: Text('Show All'),
                       ),
-                      MenuItemButton(onPressed: () {
-                        setState(() {
-                          showAll=false;
-                          //by month, TO Do
-                        });
-                        _filterMenuContoller.close();
-                      }, child: Text('By Month')),
+                      MenuItemButton(
+                        onPressed: () async {
+                          await _selectMonth(context);
+                          setState(() {
+                            showAll = false;
+                          });
+                          _filterMenuContoller.close();
+                        },
+                        child: Text('By Month'),
+                      ),
                     ],
                   ),
                 ],
