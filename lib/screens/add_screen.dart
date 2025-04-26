@@ -206,72 +206,79 @@ class _AddScreenState extends State<AddScreen> {
                         ),
                         SizedBox(height: 30),
 
-                        // Price
-                        TextFormField(
-                          controller: _priceController,
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty)
-                              return 'Enter a price';
-                            final number = num.tryParse(value);
-                            if (number == null || number <= 0) {
-                              return 'Enter a valid price';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Price (RM)',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Color.fromARGB(100, 0, 0, 0),
+                        Row(
+                          children: [
+                            // Price
+                            Expanded(
+                              child: TextFormField(
+                                controller: _priceController,
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty)
+                                    return 'Enter a price';
+                                  final number = num.tryParse(value);
+                                  if (number == null || number <= 0) {
+                                    return 'Enter a valid price';
+                                  }
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Price (RM)',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color.fromARGB(100, 0, 0, 0),
+                                    ),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
+                                ),
                               ),
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 30),
+                            SizedBox(width: 8),
 
-                        // Quantity
-                        TextFormField(
-                          controller: _quantityController,
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty)
-                              return 'Enter quantity';
-                            final number = int.tryParse(value);
-                            if (number == null || number <= 0) {
-                              return 'Enter a valid quantity';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Quantity',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Color.fromARGB(100, 0, 0, 0),
+                            // Quantity
+                            Expanded(
+                              child: TextFormField(
+                                controller: _quantityController,
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty)
+                                    return 'Enter quantity';
+                                  final number = int.tryParse(value);
+                                  if (number == null || number <= 0) {
+                                    return 'Enter a valid quantity';
+                                  }
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Quantity',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color.fromARGB(100, 0, 0, 0),
+                                    ),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
+                                ),
                               ),
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                          ),
+                          ],
                         ),
                         SizedBox(height: 30),
-
                         //Date Picker
                         TextFormField(
                           controller: _dateController,
