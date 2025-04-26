@@ -1,5 +1,6 @@
 import 'package:expenses_tracker_app/services/crud_service.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ListExpenses extends StatefulWidget {
   const ListExpenses({super.key, required this.showAll, this.selectedMonth});
@@ -51,6 +52,9 @@ class _ListExpensesState extends State<ListExpenses> {
                     horizontal: 8,
                   ),
                   child: ListTile(
+                    onTap: (){
+                      context.go('home/editDelete',extra: item);
+                    },
                     tileColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -66,4 +70,3 @@ class _ListExpensesState extends State<ListExpenses> {
     );
   }
 }
-

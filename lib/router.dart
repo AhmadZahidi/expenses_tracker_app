@@ -1,4 +1,5 @@
 import 'package:expenses_tracker_app/screens/add_screen.dart';
+import 'package:expenses_tracker_app/screens/editDelete_screen.dart';
 import 'package:expenses_tracker_app/screens/home_screen.dart';
 import 'package:expenses_tracker_app/screens/report_screen.dart';
 import 'package:expenses_tracker_app/screens/splash_screen.dart';
@@ -23,6 +24,13 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
     GoRoute(path: '/home/add', builder: (context, state) => AddScreen()),
+    GoRoute(
+      path: '/home/editDelete',
+      builder: (context, state) {
+        final item = state.extra as Map<String, dynamic>;
+        return EditdeleteScreen(expenseData: item);
+      },
+    ),
 
     GoRoute(path: '/report', builder: (context, state) => ReportScreen()),
     GoRoute(path: '/test', builder: (context, state) => TestScreen()),
