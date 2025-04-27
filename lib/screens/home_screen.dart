@@ -5,6 +5,7 @@ import 'package:expenses_tracker_app/reusable%20widget/navigation_drawer_items.d
 import 'package:expenses_tracker_app/reusable%20widget/total_expenses.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,12 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> _selectMonth(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showMonthPicker(
       context: context,
       initialDate: selectedMonth ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
-      initialDatePickerMode: DatePickerMode.year, // Start at year level
     );
 
     if (picked != null) {
@@ -76,7 +76,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     color: Colors.white,
-                    child: Center(child: TotalExpenses(showAll: showAll)),
+                    child: Center(
+                      child: TotalExpenses(
+                        showAll: showAll,
+                        selectedMonth: selectedMonth,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -161,7 +166,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               //content
-              Expanded(child: ListExpenses(showAll: showAll)),
+              Expanded(
+                child: ListExpenses(
+                  showAll: showAll,
+                  selectedMonth: selectedMonth,
+                ),
+              ),
             ],
           ),
         ),

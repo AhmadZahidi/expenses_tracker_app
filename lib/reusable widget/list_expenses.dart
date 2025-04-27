@@ -53,7 +53,7 @@ class _ListExpensesState extends State<ListExpenses> {
                   ),
                   child: ListTile(
                     onTap: (){
-                      context.go('home/editDelete',extra: item);
+                      context.push('/home/editDelete',extra: item);
                     },
                     tileColor: Colors.white,
                     shape: RoundedRectangleBorder(

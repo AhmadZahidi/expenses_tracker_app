@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/reusable%20widget/background_screen.dart';
 import 'package:expenses_tracker_app/reusable%20widget/crudbar.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditdeleteScreen extends StatefulWidget {
-  const EditdeleteScreen({super.key, this.expenseData});
+  const EditdeleteScreen({super.key, required this.expenseData});
   final Map<String, dynamic>? expenseData;
 
   @override
@@ -27,11 +27,11 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
   final picker = ImagePicker();
 
   final CrudService crudService = CrudService();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _priceController = TextEditingController();
-  TextEditingController _quantityController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  TextEditingController _descController = TextEditingController();
+  late TextEditingController nameController;
+  late TextEditingController priceController;
+  late TextEditingController quantityController;
+  late TextEditingController dateController;
+  late TextEditingController descController;
 
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -66,10 +66,26 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+        dateController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
   }
+
+  DateTime? _parseDate(String? dateStr) {
+  if (dateStr == null) return null;
+  try {
+    final parts = dateStr.split('/');
+    if (parts.length == 3) {
+      final day = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final year = int.parse(parts[2]);
+      return DateTime(year, month, day);
+    }
+  } catch (e) {
+    print('Error parsing date: $e');
+  }
+  return null;
+}
 
   String? _selectedCategory;
   final List<String> _categories = [
@@ -80,33 +96,30 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
     'Health',
     'Other',
   ];
+  
+  
 
   @override
   void initState() {
     super.initState();
-    // Initialize controllers with existing data
-    _nameController = TextEditingController(text: widget.expenseData['name']);
-    _priceController = TextEditingController(
-      text: widget.expenseData['price'].toString(),
+    nameController = TextEditingController(text: widget.expenseData!['name'] ?? '');
+    priceController = TextEditingController(text: widget.expenseData!['price'].toString()?? '');
+    quantityController = TextEditingController(
+      text: widget.expenseData!['quantity'].toString()?? '',
     );
-    _quantityController = TextEditingController(
-      text: widget.expenseData['quantity'].toString(),
-    );
-    _descController = TextEditingController(
-      text: widget.expenseData['desc'] ?? '',
-    );
-    _selectedCategory = widget.expenseData['category'];
-    _selectedDate = DateTime.parse(widget.expenseData['date']);
-    _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
-    _uploadedImageUrl = widget.expenseData['imageUrl'];
+    final formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.expenseData!['date']?? ''));
+    dateController = TextEditingController(text: formattedDate?? '');
+    descController = TextEditingController(text: widget.expenseData!['desc']?? '');
+    _selectedDate = _parseDate(widget.expenseData!['date']);
+    _selectedCategory = widget.expenseData!['category'];
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _priceController.dispose();
-    _quantityController.dispose();
-    _descController.dispose();
+    nameController.dispose();
+    priceController.dispose();
+    quantityController.dispose();
+    descController.dispose();
     super.dispose();
   }
 
@@ -115,7 +128,7 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
     return Stack(
       children: [
         BackgroundScreen(
-          appBar: Crudbar('Add Expenses'),
+          appBar: Crudbar('Edit and Delete Expenses'),
           backgroundColor: mainBackGround,
           screen: Padding(
             padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
@@ -129,12 +142,17 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                     child:
                         _receiptImage != null
                             ? Image.file(_receiptImage!, height: 200)
-                            : Container(
-                              height: 200,
-                              width: double.infinity,
-                              color: Colors.grey[200],
-                              child: const Icon(Icons.camera_alt, size: 50),
-                            ),
+                            : (widget.expenseData!['imageUrl'] != null
+                                ? Image.network(
+                                  widget.expenseData!['imageUrl'],
+                                  height: 200,
+                                )
+                                : Container(
+                                  height: 200,
+                                  width: double.infinity,
+                                  color: Colors.grey[200],
+                                  child: const Icon(Icons.camera_alt, size: 50),
+                                )),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -143,7 +161,7 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                       children: [
                         // Name
                         TextFormField(
-                          controller: _nameController,
+                          controller: nameController,
                           validator:
                               (value) =>
                                   value == null || value.trim().isEmpty
@@ -204,7 +222,7 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
 
                         //description
                         TextFormField(
-                          controller: _descController,
+                          controller: descController,
                           decoration: InputDecoration(
                             labelText: 'Description',
                             border: OutlineInputBorder(
@@ -230,7 +248,7 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                             // Price
                             Expanded(
                               child: TextFormField(
-                                controller: _priceController,
+                                controller: priceController,
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value == null || value.isEmpty)
@@ -265,7 +283,7 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                             // Quantity
                             Expanded(
                               child: TextFormField(
-                                controller: _quantityController,
+                                controller: quantityController,
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value == null || value.isEmpty)
@@ -300,7 +318,7 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                         SizedBox(height: 30),
                         //Date Picker
                         TextFormField(
-                          controller: _dateController,
+                          controller: dateController,
                           readOnly: true,
                           onTap: () => _pickDate(context),
                           decoration: InputDecoration(
@@ -320,25 +338,35 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             FilledButton(
-                              onPressed: () {
-                                setState(() {
-                                  _receiptImage = null;
-                                  _uploadedImageUrl = null;
-                                });
+                              onPressed: () async {
+                                try {
+                                  await crudService.deleteExpense(
+                                    widget.expenseData!['id'],
+                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Expense deleted successfully',
+                                      ),
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Failed to delete: $e'),
+                                    ),
+                                  );
+                                }
                               },
                               style: FilledButton.styleFrom(
                                 padding: EdgeInsets.symmetric(horizontal: 24),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                backgroundColor: const Color.fromARGB(
-                                  255,
-                                  190,
-                                  178,
-                                  0,
-                                ),
+                                backgroundColor: Colors.red,
                               ),
-                              child: Text('Clear Image'),
+                              child: Text('Delete'),
                             ),
                             SizedBox(width: 16),
                             FilledButton(
@@ -347,44 +375,40 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                                   setState(() {
                                     _isLoading = true;
                                   });
+                                  String imageUrl =
+                                      widget.expenseData!['imageUrl'] ?? '';
+
+                                  if (_receiptImage != null) {
+                                    final uploadedUrl = await crudService
+                                        .uploadImageToFirebase(_receiptImage!);
+                                    if (uploadedUrl != null) {
+                                      imageUrl = uploadedUrl;
+                                    }
+                                  }
 
                                   try {
-                                    if (_receiptImage != null &&
-                                        _uploadedImageUrl == null) {
-                                      await _uploadImage(_receiptImage!);
-                                    }
-
-                                    await crudService.addExpense(
-                                      _nameController.text,
-                                      _selectedCategory!,
-                                      _descController.text,
-                                      double.parse(_priceController.text),
-                                      int.parse(_quantityController.text),
-                                      _selectedDate!,
-                                      _uploadedImageUrl,
-                                    );
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Item added successfully',
+                                    await crudService.updateExpense(
+                                      widget.expenseData!['id'],
+                                      {
+                                        'name': nameController.text,
+                                        'category': _selectedCategory!,
+                                        'price': double.parse(
+                                          priceController.text,
                                         ),
-                                      ),
+                                        'quantity': int.parse(
+                                          quantityController.text,
+                                        ),
+                                        'date':
+                                            _selectedDate, // or your selected date
+                                        'desc': descController.text,
+                                        'imageUrl': imageUrl,
+                                      },
                                     );
-
-                                    // Reset form
-                                    _formKey.currentState!.reset();
-                                    _nameController.clear();
-                                    _priceController.clear();
-                                    _quantityController.clear();
-                                    _descController.clear();
-                                    _dateController.clear();
-                                    _selectedCategory = null;
-                                    _selectedDate = null;
+                                    Navigator.pop(context);
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Something went wrong'),
+                                        content: Text('Failed to update: $e'),
                                       ),
                                     );
                                   } finally {
@@ -402,7 +426,7 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                                 ),
                                 backgroundColor: buttonBackground,
                               ),
-                              child: Text('Submit'),
+                              child: Text('Update'),
                             ),
                           ],
                         ),
