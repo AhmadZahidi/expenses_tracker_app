@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 
 class CrudService {
   Future<DocumentReference<Object?>>? addExpense(
@@ -98,28 +97,6 @@ class CrudService {
     }
   }
 
-  //   Future<void> updateExpense() async {
-  //   try {
-  //     await FirebaseFirestore.instance
-  //         .collection('expenses')
-  //         .doc(widget.expenseData['id']) // assuming 'id' is the document ID
-  //         .update({
-  //       'name': nameController.text,
-  //       'quantity': int.tryParse(quantityController.text) ?? 0,
-  //       'price': double.tryParse(priceController.text) ?? 0.0,
-  //     });
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Expense updated successfully')),
-  //     );
-
-  //     Navigator.pop(context); // Go back after updating
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Failed to update: $e')),
-  //     );
-  //   }
-  // }
 
   Future<String?> uploadImageToFirebase(File imageFile) async {
     try {
@@ -132,7 +109,7 @@ class CrudService {
           .child(uid)
           .child('$fileName.jpg');
 
-      final uploadTask = await ref.putFile(imageFile);
+      // final uploadTask = await ref.putFile(imageFile);
       final downloadUrl = await ref.getDownloadURL();
 
       return downloadUrl;
