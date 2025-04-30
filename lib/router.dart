@@ -33,6 +33,5 @@ final GoRouter appRouter = GoRouter(
     ),
 
     GoRoute(path: '/report', builder: (context, state) => ReportScreen()),
-    GoRoute(path: '/test', builder: (context, state) => TestScreen()),
   ],
 );

@@ -98,24 +98,27 @@ class CrudService {
   }
 
 
-  Future<String?> uploadImageToFirebase(File imageFile) async {
-    try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+Future<String?> uploadImageToFirebase(File imageFile) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
 
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('user_receipts')
-          .child(uid)
-          .child('$fileName.jpg');
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('user_receipts')
+        .child(uid)
+        .child('$fileName.jpg');
 
-      // final uploadTask = await ref.putFile(imageFile);
-      final downloadUrl = await ref.getDownloadURL();
+    await ref.putFile(imageFile);
 
-      return downloadUrl;
-    } catch (e) {
-      print('Error uploading image: $e');
-      return null;
-    }
+    final downloadUrl = await ref.getDownloadURL();
+
+    return downloadUrl;
+  } catch (e) {
+    print('Error uploading image: $e');
+    log('Upload error: $e');
+    return null;
   }
+}
+
 }

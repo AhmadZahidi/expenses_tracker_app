@@ -40,7 +40,6 @@ class _AddScreenState extends State<AddScreen> {
       setState(() {
         _receiptImage = File(pickedFile.path);
       });
-      // await _uploadImage(File(pickedFile.path));
     }
   }
 

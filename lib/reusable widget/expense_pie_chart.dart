@@ -4,7 +4,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class ExpensePieChart extends StatefulWidget {
-  const ExpensePieChart({super.key});
+  const ExpensePieChart({
+    super.key,
+    required this.filterByMonth,
+    this.selectedMonth,
+  });
+  final bool filterByMonth;
+  final DateTime? selectedMonth;
 
   @override
   State<StatefulWidget> createState() => _ExpensePieChartState();
@@ -42,10 +48,19 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
           }
 
           final docs = snapshot.data?.docs ?? [];
+          final filteredDocs =
+              (widget.filterByMonth && widget.selectedMonth != null)
+                  ? docs.where((expense) {
+                    final expenseDate = DateTime.tryParse(expense['date']);
+                    if (expenseDate == null) return false;
+                    return expenseDate.year == widget.selectedMonth!.year &&
+                        expenseDate.month == widget.selectedMonth!.month;
+                  }).toList()
+                  : docs;
 
           // Calculate totals per category
           Map<String, double> categoryTotals = {};
-          for (var doc in docs) {
+          for (var doc in filteredDocs) {
             final data = doc.data() as Map<String, dynamic>;
             final category = data['category'] ?? 'Other';
             final price = (data['price'] ?? 0).toDouble();

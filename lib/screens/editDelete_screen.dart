@@ -72,20 +72,20 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
   }
 
   DateTime? _parseDate(String? dateStr) {
-  if (dateStr == null) return null;
-  try {
-    final parts = dateStr.split('/');
-    if (parts.length == 3) {
-      final day = int.parse(parts[0]);
-      final month = int.parse(parts[1]);
-      final year = int.parse(parts[2]);
-      return DateTime(year, month, day);
+    if (dateStr == null) return null;
+    try {
+      final parts = dateStr.split('/');
+      if (parts.length == 3) {
+        final day = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        final year = int.parse(parts[2]);
+        return DateTime(year, month, day);
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
     }
-  } catch (e) {
-    print('Error parsing date: $e');
+    return null;
   }
-  return null;
-}
 
   String? _selectedCategory;
   final List<String> _categories = [
@@ -96,21 +96,30 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
     'Health',
     'Other',
   ];
-  
-  
 
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.expenseData!['name'] ?? '');
-    priceController = TextEditingController(text: widget.expenseData!['price'].toString()?? '');
-    quantityController = TextEditingController(
-      text: widget.expenseData!['quantity'].toString()?? '',
+    nameController = TextEditingController(
+      text: widget.expenseData!['name'] ?? '',
     );
-    final formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.expenseData!['date']?? ''));
-    dateController = TextEditingController(text: formattedDate?? '');
-    descController = TextEditingController(text: widget.expenseData!['desc']?? '');
-    _selectedDate = _parseDate(widget.expenseData!['date']);
+    priceController = TextEditingController(
+      text: widget.expenseData!['price'].toString() ?? '',
+    );
+    quantityController = TextEditingController(
+      text: widget.expenseData!['quantity'].toString() ?? '',
+    );
+    final dateFromFirebase = widget.expenseData?['date'];
+    _selectedDate = DateTime.parse(dateFromFirebase);
+
+    final formattedDate =
+        "${_selectedDate?.day}/${_selectedDate?.month}/${_selectedDate?.year}";
+    dateController = TextEditingController(text: formattedDate);
+    descController = TextEditingController(
+      text: widget.expenseData!['desc'] ?? '',
+    );
+    _selectedDate = DateTime.tryParse(widget.expenseData!['date'].toString());
+
     _selectedCategory = widget.expenseData!['category'];
   }
 
