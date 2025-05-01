@@ -16,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final MenuController _filterMenuContoller = MenuController();
-  bool showAll = true;
+
   DateTime? selectedMonth;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -32,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (picked != null) {
       setState(() {
         selectedMonth = DateTime(picked.year, picked.month);
-        showAll = false;
       });
     }
   }
@@ -77,10 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     color: Colors.white,
                     child: Center(
-                      child: TotalExpenses(
-                        showAll: showAll,
-                        selectedMonth: selectedMonth,
-                      ),
+                      child: TotalExpenses(selectedMonth: selectedMonth),
                     ),
                   ),
                 ),
@@ -126,52 +122,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Expenses List", style: TextStyle(fontSize: 24)),
-                  MenuAnchor(
-                    controller: _filterMenuContoller,
-                    builder: (context, controller, child) {
-                      return IconButton(
-                        onPressed: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        icon: Icon(Icons.filter_list),
-                      );
+
+                  IconButton(
+                    onPressed: () async {
+                      await _selectMonth(context);
+                      setState(() {});
+                      _filterMenuContoller.close();
                     },
-                    menuChildren: [
-                      MenuItemButton(
-                        onPressed: () {
-                          setState(() {
-                            showAll = true;
-                          });
-                          _filterMenuContoller.close();
-                        },
-                        child: Text('Show All'),
-                      ),
-                      MenuItemButton(
-                        onPressed: () async {
-                          await _selectMonth(context);
-                          setState(() {
-                            showAll = false;
-                          });
-                          _filterMenuContoller.close();
-                        },
-                        child: Text('By Month'),
-                      ),
-                    ],
+                    icon: Icon(Icons.calendar_month_outlined),
                   ),
                 ],
               ),
 
               //content
-              Expanded(
-                child: ListExpenses(
-                  showAll: showAll,
-                  selectedMonth: selectedMonth,
-                ),
-              ),
+              Expanded(child: ListExpenses(selectedMonth: selectedMonth)),
             ],
           ),
         ),

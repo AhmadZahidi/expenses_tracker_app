@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ListExpenses extends StatefulWidget {
-  const ListExpenses({super.key, required this.showAll, this.selectedMonth});
-  final bool showAll;
+  const ListExpenses({super.key, this.selectedMonth});
+
   final DateTime? selectedMonth;
 
   @override
@@ -16,11 +16,12 @@ class _ListExpensesState extends State<ListExpenses> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: crudService.getExpenses(),
+    return StreamBuilder<List<Map<String, dynamic>>>(  
+      stream: widget.selectedMonth == null
+          ? crudService.getExpenses()
+          : crudService.getExpensesForMonth(widget.selectedMonth!),
       builder: (context, snapshot) {
-        if (!snapshot.hasData &&
-            snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData && snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -29,44 +30,34 @@ class _ListExpensesState extends State<ListExpenses> {
         }
 
         final expenses = snapshot.data ?? [];
-        final filteredExpenses =
-            widget.showAll
-                ? expenses
-                : expenses.where((expense) {
-                  final expenseDate = DateTime.parse(expense['date']);
-                  return expenseDate.year == widget.selectedMonth?.year &&
-                      expenseDate.month == widget.selectedMonth?.month;
-                }).toList();
 
-        return filteredExpenses.isEmpty
+        return expenses.isEmpty
             ? const Center(child: Text("No expenses found"))
             : ListView.builder(
-              padding: const EdgeInsets.only(bottom: 16),
-              itemCount: filteredExpenses.length,
-              itemBuilder: (context, index) {
-                final item = filteredExpenses[index];
-                return Card(
-                  elevation: 3,
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 8,
-                  ),
-                  child: ListTile(
-                    onTap: (){
-                      context.push('/home/editDelete',extra: item);
-                    },
-                    tileColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                padding: const EdgeInsets.only(bottom: 16),
+                itemCount: expenses.length,
+                itemBuilder: (context, index) {
+                  final item = expenses[index];
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    child: ListTile(
+                      onTap: () {
+                        context.push('/home/editDelete', extra: item);
+                      },
+                      tileColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      title: Text(item['name'] ?? 'Unnamed'),
+                      subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
+                      trailing: Text("RM ${item['price'] ?? '-'}"),
                     ),
-                    title: Text(item['name'] ?? 'Unnamed'),
-                    subtitle: Text("Quantity: ${item['quantity'] ?? '-'}"),
-                    trailing: Text("RM ${item['price'] ?? '-'}"),
-                  ),
-                );
-              },
-            );
+                  );
+                },
+              );
       },
     );
   }
 }
+

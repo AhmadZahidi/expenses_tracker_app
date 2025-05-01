@@ -4,6 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+DateTime now = DateTime.now();
+DateTime startOfMonth = DateTime(now.year, now.month, 1);
+DateTime endOfMonth = DateTime(now.year, now.month + 1, 1).subtract(Duration(seconds: 1));
+
+
 class CrudService {
   Future<DocumentReference<Object?>>? addExpense(
     String name,
@@ -26,7 +31,7 @@ class CrudService {
             'desc': desc,
             'price': price,
             'quantity': quantity,
-            'date': date.toIso8601String(),
+            'date': Timestamp.fromDate(date),
             'imageUrl': imageUrl,
           });
     } catch (e) {
@@ -35,25 +40,56 @@ class CrudService {
     }
   }
 
-  Stream<List<Map<String, dynamic>>> getExpenses() {
-    final String uid = FirebaseAuth.instance.currentUser!.uid;
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('expenses')
-        .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs
-                  .map(
-                    (doc) => {
-                      'id': doc.id,
-                      ...doc.data() as Map<String, dynamic>,
-                    },
-                  )
-                  .toList(),
-        );
-  }
+ Stream<List<Map<String, dynamic>>> getExpenses() {
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  final DateTime now = DateTime.now();
+  final DateTime startOfMonth = DateTime(now.year, now.month, 1);
+  final DateTime endOfMonth = DateTime(now.year, now.month + 1, 1).subtract(Duration(seconds: 1));
+
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .collection('expenses')
+      .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+      .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+      .orderBy('date', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => {
+                  'id': doc.id,
+                  ...doc.data() as Map<String, dynamic>,
+                })
+            .toList(),
+      );
+}
+
+Stream<List<Map<String, dynamic>>> getExpensesForMonth(DateTime selectedMonth) {
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  final DateTime startOfMonth = DateTime(selectedMonth.year, selectedMonth.month, 1);
+  final DateTime endOfMonth = DateTime(selectedMonth.year, selectedMonth.month + 1, 1)
+      .subtract(const Duration(seconds: 1));
+
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .collection('expenses')
+      .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+      .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+      .orderBy('date', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs.map(
+          (doc) => {
+            'id': doc.id,
+            ...doc.data() as Map<String, dynamic>,
+          }).toList(),
+      );
+}
+
+
 
   Future<void> deleteExpense(String id) async {
     try {

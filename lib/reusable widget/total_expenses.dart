@@ -1,14 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expenses_tracker_app/services/crud_service.dart';
 import 'package:flutter/material.dart';
 
 class TotalExpenses extends StatefulWidget {
-  TotalExpenses({
-    super.key,
-    required this.showAll,
-    this.selectedMonth,
-  });
-  bool showAll;
-  final DateTime? selectedMonth; 
+  TotalExpenses({super.key, this.selectedMonth});
+
+  final DateTime? selectedMonth;
 
   @override
   State<TotalExpenses> createState() => _TotalExpensesState();
@@ -20,7 +17,10 @@ class _TotalExpensesState extends State<TotalExpenses> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: crudService.getExpenses(),
+      stream:
+          widget.selectedMonth == null
+              ? crudService.getExpenses()
+              : crudService.getExpensesForMonth(widget.selectedMonth!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Text("Loading...");
@@ -31,12 +31,14 @@ class _TotalExpensesState extends State<TotalExpenses> {
         }
 
         final expenses = snapshot.data ?? [];
-        
+
         final filteredExpenses =
-            widget.showAll
+            widget.selectedMonth == null
                 ? expenses
                 : expenses.where((expense) {
-                  final expenseDate = DateTime.parse(expense['date']);
+                  final expenseDate =
+                      (expense['date'] as Timestamp)
+                          .toDate(); // Use toDate() if it's a Timestamp
                   return expenseDate.year == widget.selectedMonth?.year &&
                       expenseDate.month == widget.selectedMonth?.month;
                 }).toList();

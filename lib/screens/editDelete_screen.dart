@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:intl/intl.dart';
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/reusable%20widget/background_screen.dart';
 import 'package:expenses_tracker_app/reusable%20widget/crudbar.dart';
 import 'package:expenses_tracker_app/services/crud_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditdeleteScreen extends StatefulWidget {
   const EditdeleteScreen({super.key, required this.expenseData});
@@ -39,7 +39,6 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
       setState(() {
         _receiptImage = File(pickedFile.path);
       });
-      // await _uploadImage(File(pickedFile.path));
     }
   }
 
@@ -110,15 +109,15 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
       text: widget.expenseData!['quantity'].toString() ?? '',
     );
     final dateFromFirebase = widget.expenseData?['date'];
-    _selectedDate = DateTime.parse(dateFromFirebase);
+    _selectedDate = (dateFromFirebase as Timestamp).toDate();
 
     final formattedDate =
         "${_selectedDate?.day}/${_selectedDate?.month}/${_selectedDate?.year}";
     dateController = TextEditingController(text: formattedDate);
+    
     descController = TextEditingController(
       text: widget.expenseData!['desc'] ?? '',
     );
-    _selectedDate = DateTime.tryParse(widget.expenseData!['date'].toString());
 
     _selectedCategory = widget.expenseData!['category'];
   }
@@ -384,12 +383,13 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  String imageUrl =
-                                      widget.expenseData!['imageUrl'] ?? '';
+                                  String? imageUrl =
+                                      widget.expenseData?['imageUrl'] ;
 
                                   if (_receiptImage != null) {
                                     final uploadedUrl = await crudService
                                         .uploadImageToFirebase(_receiptImage!);
+                                        imageUrl = uploadedUrl;
                                     if (uploadedUrl != null) {
                                       imageUrl = uploadedUrl;
                                     }
@@ -407,8 +407,17 @@ class _EditdeleteScreenState extends State<EditdeleteScreen> {
                                         'quantity': int.parse(
                                           quantityController.text,
                                         ),
-                                        'date':
-                                            _selectedDate, // or your selected date
+                                        'date': Timestamp.fromDate(
+                                          DateTime(
+                                            _selectedDate!.year,
+                                            _selectedDate!.month,
+                                            _selectedDate!.day,
+                                            DateTime.now().hour,
+                                            DateTime.now().minute,
+                                            DateTime.now().second,
+                                          ),
+                                        ),
+
                                         'desc': descController.text,
                                         'imageUrl': imageUrl,
                                       },

@@ -56,20 +56,30 @@ class _AddScreenState extends State<AddScreen> {
     }
   }
 
-  Future<void> _pickDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+Future<void> _pickDate(BuildContext context) async {
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime(2000),
+    lastDate: DateTime(2100),
+  );
+  if (picked != null) {
+    final now = DateTime.now();
+    final combined = DateTime(
+      picked.year,
+      picked.month,
+      picked.day,
+      now.hour,
+      now.minute,
+      now.second,
     );
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-        _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
-      });
-    }
+    setState(() {
+      _selectedDate = combined;
+      _dateController.text =
+          "${picked.day}/${picked.month}/${picked.year}";
+    });
   }
+}
 
   String? _selectedCategory;
   final List<String> _categories = [
