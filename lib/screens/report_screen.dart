@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:expenses_tracker_app/background_color.dart';
 import 'package:expenses_tracker_app/reusable widget/mainbar.dart';
 import 'package:expenses_tracker_app/reusable widget/navigation_drawer_items.dart';
@@ -6,6 +8,9 @@ import 'package:expenses_tracker_app/reusable%20widget/expenses_table.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:expenses_tracker_app/services/crud_service.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -19,6 +24,8 @@ class _ReportScreenState extends State<ReportScreen> {
   final userId = FirebaseAuth.instance.currentUser!.uid;
   DateTime? selectedMonth;
   String selectedCategory = 'All';
+
+  final crudService = CrudService();
 
   final Map<String, Color> categoryColors = {
     'Food': Colors.green,
@@ -45,6 +52,53 @@ class _ReportScreenState extends State<ReportScreen> {
       });
     }
   }
+
+  Future<void> _downloadPdf(DateTime? selectedMonth, String? selectedCategory) async {
+  final expenses = await crudService.getExpensesForMonthOnce(
+    selectedMonth!,
+    categoryFilter: selectedCategory,
+  );
+
+  log('[DEBUG] Expenses count: ${expenses.length}');
+
+  final pdf = pw.Document();
+
+  pdf.addPage(
+    pw.Page(
+      build: (pw.Context context) {
+        return pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'Expense Report - ${selectedMonth.month}/${selectedMonth.year}',
+              style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(height: 16),
+            pw.TableHelper.fromTextArray(
+              headers: ['No', 'Name', 'Price', 'Qty', 'Total'],
+              data: List.generate(expenses.length, (index) {
+                final item = expenses[index];
+                final name = item['name'] ?? '';
+                final price = (item['price'] ?? 0).toDouble();
+                final qty = (item['quantity'] ?? 1).toInt();
+                final total = (price * qty).toStringAsFixed(2);
+                return [
+                  (index + 1).toString(),
+                  name,
+                  'RM ${price.toStringAsFixed(2)}',
+                  qty.toString(),
+                  'RM $total',
+                ];
+              }),
+            ),
+          ],
+        );
+      },
+    ),
+  );
+
+  await Printing.layoutPdf(onLayout: (format) async => pdf.save());
+}
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +189,8 @@ class _ReportScreenState extends State<ReportScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   FilledButton(
-                    onPressed: () {},
+                    onPressed: () { _downloadPdf(selectedMonth, selectedCategory);
+                    log('Download pdf is clicked');},
                     style: FilledButton.styleFrom(
                       padding: EdgeInsets.symmetric(horizontal: 24),
                       shape: RoundedRectangleBorder(

@@ -6,8 +6,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 DateTime now = DateTime.now();
 DateTime startOfMonth = DateTime(now.year, now.month, 1);
-DateTime endOfMonth = DateTime(now.year, now.month + 1, 1).subtract(Duration(seconds: 1));
-
+DateTime endOfMonth = DateTime(
+  now.year,
+  now.month + 1,
+  1,
+).subtract(Duration(seconds: 1));
 
 class CrudService {
   Future<DocumentReference<Object?>>? addExpense(
@@ -40,66 +43,105 @@ class CrudService {
     }
   }
 
- Stream<List<Map<String, dynamic>>> getExpenses() {
-  final String uid = FirebaseAuth.instance.currentUser!.uid;
+  Stream<List<Map<String, dynamic>>> getExpenses() {
+    final String uid = FirebaseAuth.instance.currentUser!.uid;
 
-  final DateTime now = DateTime.now();
-  final DateTime startOfMonth = DateTime(now.year, now.month, 1);
-  final DateTime endOfMonth = DateTime(now.year, now.month + 1, 1).subtract(Duration(seconds: 1));
+    final DateTime now = DateTime.now();
+    final DateTime startOfMonth = DateTime(now.year, now.month, 1);
+    final DateTime endOfMonth = DateTime(
+      now.year,
+      now.month + 1,
+      1,
+    ).subtract(Duration(seconds: 1));
 
-  return FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .collection('expenses')
-      .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
-      .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
-      .orderBy('date', descending: true)
-      .snapshots()
-      .map(
-        (snapshot) => snapshot.docs
-            .map((doc) => {
-                  'id': doc.id,
-                  ...doc.data() as Map<String, dynamic>,
-                })
-            .toList(),
-      );
-}
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('expenses')
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map(
+                    (doc) => {
+                      'id': doc.id,
+                      ...doc.data() as Map<String, dynamic>,
+                    },
+                  )
+                  .toList(),
+        );
+  }
 
-Stream<List<Map<String, dynamic>>> getExpensesForMonth(
+  Stream<List<Map<String, dynamic>>> getExpensesForMonth(
+    DateTime selectedMonth, {
+    String? categoryFilter,
+  }) {
+    final String uid = FirebaseAuth.instance.currentUser!.uid;
+
+    final DateTime startOfMonth = DateTime(
+      selectedMonth.year,
+      selectedMonth.month,
+      1,
+    );
+    final DateTime endOfMonth = DateTime(
+      selectedMonth.year,
+      selectedMonth.month + 1,
+      1,
+    ).subtract(const Duration(seconds: 1));
+
+    Query query = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('expenses')
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth));
+
+    // Add category filter if it's not null and not "All"
+    if (categoryFilter != null && categoryFilter != 'All') {
+      query = query.where('category', isEqualTo: categoryFilter);
+    }
+
+    return query
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map(
+                    (doc) => {
+                      'id': doc.id,
+                      ...doc.data() as Map<String, dynamic>,
+                    },
+                  )
+                  .toList(),
+        );
+  }
+
+  Future<List<Map<String, dynamic>>> getExpensesForMonthOnce(
   DateTime selectedMonth, {
   String? categoryFilter,
-}) {
-  final String uid = FirebaseAuth.instance.currentUser!.uid;
+}) async {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  final start = DateTime(selectedMonth.year, selectedMonth.month);
+  final end = DateTime(selectedMonth.year, selectedMonth.month + 1);
 
-  final DateTime startOfMonth = DateTime(selectedMonth.year, selectedMonth.month, 1);
-  final DateTime endOfMonth = DateTime(selectedMonth.year, selectedMonth.month + 1, 1)
-      .subtract(const Duration(seconds: 1));
-
-  Query query = FirebaseFirestore.instance
+  var query = FirebaseFirestore.instance
       .collection('users')
-      .doc(uid)
+      .doc(userId)
       .collection('expenses')
-      .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
-      .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth));
+      .where('date', isGreaterThanOrEqualTo: start)
+      .where('date', isLessThan: end);
 
-  // Add category filter if it's not null and not "All"
   if (categoryFilter != null && categoryFilter != 'All') {
     query = query.where('category', isEqualTo: categoryFilter);
   }
 
-  return query
-      .orderBy('date', descending: true)
-      .snapshots()
-      .map(
-        (snapshot) => snapshot.docs.map(
-          (doc) => {
-            'id': doc.id,
-            ...doc.data() as Map<String, dynamic>,
-          }).toList(),
-      );
+  final snapshot = await query.get();
+  return snapshot.docs.map((doc) => doc.data()).toList();
 }
-
-
 
 
   Future<void> deleteExpense(String id) async {
@@ -137,35 +179,33 @@ Stream<List<Map<String, dynamic>>> getExpensesForMonth(
                     ? (updateItems['date'] as DateTime).toIso8601String()
                     : updateItems['date'],
             'desc': updateItems['desc'],
-            'imageUrl':updateItems['imageUrl']
+            'imageUrl': updateItems['imageUrl'],
           });
     } catch (e) {
       log("Error updateing expense: $e");
     }
   }
 
+  Future<String?> uploadImageToFirebase(File imageFile) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
 
-Future<String?> uploadImageToFirebase(File imageFile) async {
-  try {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_receipts')
+          .child(uid)
+          .child('$fileName.jpg');
 
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('user_receipts')
-        .child(uid)
-        .child('$fileName.jpg');
+      await ref.putFile(imageFile);
 
-    await ref.putFile(imageFile);
+      final downloadUrl = await ref.getDownloadURL();
 
-    final downloadUrl = await ref.getDownloadURL();
-
-    return downloadUrl;
-  } catch (e) {
-    print('Error uploading image: $e');
-    log('Upload error: $e');
-    return null;
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      log('Upload error: $e');
+      return null;
+    }
   }
-}
-
 }
