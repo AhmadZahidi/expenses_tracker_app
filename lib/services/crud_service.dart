@@ -65,19 +65,29 @@ class CrudService {
       );
 }
 
-Stream<List<Map<String, dynamic>>> getExpensesForMonth(DateTime selectedMonth) {
+Stream<List<Map<String, dynamic>>> getExpensesForMonth(
+  DateTime selectedMonth, {
+  String? categoryFilter,
+}) {
   final String uid = FirebaseAuth.instance.currentUser!.uid;
 
   final DateTime startOfMonth = DateTime(selectedMonth.year, selectedMonth.month, 1);
   final DateTime endOfMonth = DateTime(selectedMonth.year, selectedMonth.month + 1, 1)
       .subtract(const Duration(seconds: 1));
 
-  return FirebaseFirestore.instance
+  Query query = FirebaseFirestore.instance
       .collection('users')
       .doc(uid)
       .collection('expenses')
       .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
-      .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+      .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth));
+
+  // Add category filter if it's not null and not "All"
+  if (categoryFilter != null && categoryFilter != 'All') {
+    query = query.where('category', isEqualTo: categoryFilter);
+  }
+
+  return query
       .orderBy('date', descending: true)
       .snapshots()
       .map(
@@ -88,6 +98,7 @@ Stream<List<Map<String, dynamic>>> getExpensesForMonth(DateTime selectedMonth) {
           }).toList(),
       );
 }
+
 
 
 

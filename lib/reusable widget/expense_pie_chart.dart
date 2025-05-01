@@ -2,15 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:expenses_tracker_app/services/crud_service.dart';
 
 class ExpensePieChart extends StatefulWidget {
-  const ExpensePieChart({
-    super.key,
-    required this.filterByMonth,
-    this.selectedMonth,
-  });
-  final bool filterByMonth;
+  const ExpensePieChart({super.key, this.selectedMonth, this.selectedCategory});
   final DateTime? selectedMonth;
+  final String? selectedCategory;
 
   @override
   State<StatefulWidget> createState() => _ExpensePieChartState();
@@ -18,6 +15,7 @@ class ExpensePieChart extends StatefulWidget {
 
 class _ExpensePieChartState extends State<ExpensePieChart> {
   final userId = FirebaseAuth.instance.currentUser!.uid;
+  final crudService = CrudService();
 
   final Map<String, Color> categoryColors = {
     'Food': Colors.green,
@@ -31,13 +29,14 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: StreamBuilder<QuerySnapshot>(
+      child: StreamBuilder<List<Map<String, dynamic>>>(
         stream:
-            FirebaseFirestore.instance
-                .collection('users')
-                .doc(userId)
-                .collection('expenses')
-                .snapshots(),
+            widget.selectedMonth == null
+                ? crudService.getExpenses()
+                : crudService.getExpensesForMonth(
+                  widget.selectedMonth!,
+                  categoryFilter: widget.selectedCategory,
+                ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -47,21 +46,33 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          final docs = snapshot.data?.docs ?? [];
+          final docs = snapshot.data ?? [];
           final filteredDocs =
-              (widget.filterByMonth && widget.selectedMonth != null)
+              (widget.selectedMonth != null)
                   ? docs.where((expense) {
-                    final expenseDate = DateTime.tryParse(expense['date']);
+                    final rawDate = expense['date'];
+                    final expenseDate =
+                        rawDate is Timestamp ? rawDate.toDate() : rawDate;
+
                     if (expenseDate == null) return false;
-                    return expenseDate.year == widget.selectedMonth!.year &&
+
+                    final matchesDate =
+                        expenseDate.year == widget.selectedMonth!.year &&
                         expenseDate.month == widget.selectedMonth!.month;
+
+                    final matchesCategory =
+                        widget.selectedCategory == null ||
+                        widget.selectedCategory == 'All' ||
+                        expense['category'] == widget.selectedCategory;
+
+                    return matchesDate && matchesCategory;
                   }).toList()
                   : docs;
 
           // Calculate totals per category
           Map<String, double> categoryTotals = {};
           for (var doc in filteredDocs) {
-            final data = doc.data() as Map<String, dynamic>;
+            final data = doc;
             final category = data['category'] ?? 'Other';
             final price = (data['price'] ?? 0).toDouble();
             final quantity = (data['quantity'] ?? 1).toInt();

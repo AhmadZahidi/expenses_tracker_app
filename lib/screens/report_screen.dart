@@ -18,7 +18,7 @@ class _ReportScreenState extends State<ReportScreen> {
   final MenuController _filterDate = MenuController();
   final userId = FirebaseAuth.instance.currentUser!.uid;
   DateTime? selectedMonth;
-  bool filterByMonth = true;
+  String selectedCategory = 'All';
 
   final Map<String, Color> categoryColors = {
     'Food': Colors.green,
@@ -42,7 +42,6 @@ class _ReportScreenState extends State<ReportScreen> {
     if (picked != null) {
       setState(() {
         selectedMonth = DateTime(picked.year, picked.month);
-        filterByMonth = false;
       });
     }
   }
@@ -72,57 +71,63 @@ class _ReportScreenState extends State<ReportScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('History', style: TextStyle(fontSize: 24)),
-                MenuAnchor(
-                  controller: _filterDate,
-                  builder: (context, controller, child) {
-                    return IconButton(
-                      onPressed: () {
-                        controller.isOpen
-                            ? controller.close()
-                            : controller.open();
-                      },
-                      icon: Icon(Icons.calendar_month_outlined),
-                    );
+                IconButton(
+                  onPressed: () async {
+                    await _selectMonth(context);
+                    setState(() {});
+                    _filterDate.close();
                   },
-                  menuChildren: [
-                    MenuItemButton(
-                      onPressed: () {
-                        setState(() {
-                          filterByMonth = true;
-                        });
-                        _filterDate.close();
-                      },
-                      child: Text('Show All'),
-                    ),
-                    MenuItemButton(
-                      onPressed: () async {
-                        await _selectMonth(context);
-                        setState(() {
-                          filterByMonth = false;
-                        });
-                        _filterDate.close();
-                      },
-                      child: Text('By Month'),
-                    ),
-                  ],
+                  icon: Icon(Icons.calendar_month_outlined),
                 ),
               ],
             ),
-            ExpensePieChart(filterByMonth:filterByMonth ,selectedMonth: selectedMonth,),
+            ExpensePieChart(selectedMonth: selectedMonth,selectedCategory:selectedCategory),
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('List Expenses', style: TextStyle(fontSize: 24)),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.filter_alt_outlined),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.filter_alt_outlined),
+                    onSelected: (value) {
+                      setState(() {
+                        selectedCategory = value;
+                      });
+                    },
+                    itemBuilder:
+                        (context) => [
+                          const PopupMenuItem(value: 'All', child: Text('All')),
+                          const PopupMenuItem(
+                            value: 'Food',
+                            child: Text('Food'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'Transport',
+                            child: Text('Transport'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'Rent',
+                            child: Text('Rent'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'Hobby',
+                            child: Text('Hobby'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'Health',
+                            child: Text('Health'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'Other',
+                            child: Text('Other'),
+                          ),
+                        ],
                   ),
                 ],
               ),
             ),
-            ExpensesTable(),
+            ExpensesTable(selectedMonth: selectedMonth,selectedCategory:selectedCategory),
 
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
